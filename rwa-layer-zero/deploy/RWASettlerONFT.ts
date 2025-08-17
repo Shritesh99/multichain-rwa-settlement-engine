@@ -40,7 +40,7 @@ const deploy: DeployFunction = async (hre) => {
         console.warn(`onft721Adapter configuration found on OFT deployment, skipping ONFT721 deployment`)
         return
     }
-    if (hre.network.config.eid === EndpointId.ARBSEP_V2_TESTNET) {
+    if (hre.network.config.eid === EndpointId.HEDERA_V2_TESTNET) {
         console.warn(`onft721Adapter configuration is not set to HEDERA_V2_TESTNET, skipping RWASettlerONFT deployment`)
         return
     }

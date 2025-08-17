@@ -86,12 +86,12 @@ const config: HardhatUserConfig = {
             url: process.env.SEPOLIA_RPC_URL,
             accounts,
         },
-        // 'hedera-testnet': {
-        //     eid: EndpointId.HEDERA_V2_TESTNET,
-        //     url: process.env.HEDERA_TESTNET_RPC_URL,
-        //     accounts,
-        //     chainId: 296,
-        // },
+        'hedera-testnet': {
+            eid: EndpointId.HEDERA_V2_TESTNET,
+            url: process.env.HEDERA_TESTNET_RPC_URL,
+            accounts,
+            chainId: 296,
+        },
     },
 }
 
