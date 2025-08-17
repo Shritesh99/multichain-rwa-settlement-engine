@@ -1,12 +1,41 @@
 import React, { useState } from "react";
-import { useAccount, useChainId } from "wagmi";
+import { useAccount, useChainId, useReadContract } from "wagmi";
 import { useRWA } from "../hooks/useRWA";
-import { CHAIN_IDS } from "../config/contracts";
+import {
+	CHAIN_IDS,
+	CONTRACT_ADDRESSES,
+	RWAMINTER_ABI,
+} from "../config/contracts";
+import { MessagingFee, SendParam } from "../types";
 
 export const RWAForm: React.FC = () => {
 	const { address } = useAccount();
 	const chainId = useChainId();
 	const { mintRWA, crossChainTransfer, loading } = useRWA();
+
+	// State to trigger quote reading
+	const [shouldGetQuote, setShouldGetQuote] = useState(false);
+	const [sendParamForQuote, setSendParamForQuote] =
+		useState<SendParam | null>(null);
+
+	// Contract read hook for getting transfer quote - triggered by state change
+	const {
+		data: quotedFee,
+		isLoading: isQuoteLoading,
+		error: quoteError,
+	} = useReadContract({
+		address: CONTRACT_ADDRESSES.RWAMINTER as `0x${string}`,
+		abi: RWAMINTER_ABI,
+		functionName: "quoteSend",
+		args:
+			shouldGetQuote && sendParamForQuote
+				? [sendParamForQuote, false]
+				: undefined,
+	}) as {
+		data: MessagingFee | undefined;
+		isLoading: boolean;
+		error: Error | null;
+	};
 
 	// Form state for Mint RWA
 	const [recipientAddress, setRecipientAddress] = useState("");
@@ -51,6 +80,38 @@ export const RWAForm: React.FC = () => {
 			return;
 		}
 
+		// // Build the SendParam structure for LayerZero
+		// const sendParam: SendParam = {
+		// 	dstEid: destinationChain,
+		// 	to: destinationAddress as `0x${string}`,
+		// 	tokenId: BigInt(tokenId),
+		// 	extraOptions: "0x", // Custom options if needed
+		// 	composeMsg: "0x", // Additional logic on remote chain
+		// 	onftCmd: "0x", // ONFT command
+		// };
+
+		// // Set state to trigger quote reading
+		// setShouldGetQuote(true);
+		// setSendParamForQuote(sendParam);
+
+		// // Wait for quote to be fetched
+		// if (isQuoteLoading) {
+		// 	// alert("Getting quote, please wait...");
+		// 	return;
+		// }
+
+		// if (quoteError) {
+		// 	// alert(`Failed to get quote: ${quoteError.message}`);
+		// 	return;
+		// }
+
+		// if (!quotedFee) {
+		// 	// alert("Failed to get quote fee. Please try again.");
+		// 	return;
+		// }
+
+		console.log("quotedFee", quotedFee);
+
 		const rwaValue = parseFloat(rwaCurrentValue);
 		if (isNaN(rwaValue) || rwaValue <= 0) {
 			alert("Please enter a valid RWA current value");
@@ -61,8 +122,7 @@ export const RWAForm: React.FC = () => {
 			destinationChain,
 			destinationAddress,
 			parseInt(tokenId),
-			transferInstructions,
-			BigInt(Math.floor(rwaValue * 1e18)) // Convert RWA value to wei for oracle verification
+			parseInt(rwaCurrentValue)
 		);
 
 		setTransferResult(result);

@@ -46,7 +46,8 @@ contract RWAMinterONFT is ONFT721 {
         uint32 dstEid, // LayerZero destination EID (e.g., Sepolia: 40161)
         address to, // Receiver on destination
         uint256 tokenId, // RWA token ID
-        uint256 requiredValue, // Value for oracle verification
+        uint256 requiredValue, // Value for oracle verification,
+        MessagingFee memory fee, // Messaging fee
         bytes calldata options // LayerZero options
     ) external payable onlyOwner {
         // LayerZero ONFT Transfer
@@ -54,7 +55,7 @@ contract RWAMinterONFT is ONFT721 {
             dstEid,
             abi.encode(to, tokenId, getMetadata(tokenId), requiredValue), // Embed data in LZ message
             options,
-            MessagingFee(msg.value, 0),
+            fee,
             payable(msg.sender)
         );
     }

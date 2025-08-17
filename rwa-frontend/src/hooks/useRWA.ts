@@ -6,6 +6,7 @@ import {
 	RWASETTLER_ABI,
 	CHAIN_IDS,
 } from "../config/contracts";
+import { SendParam, MessagingFee } from "../types";
 
 export interface ContractCallResult {
 	success: boolean;
@@ -74,24 +75,23 @@ export const useRWA = () => {
 		destinationEid: number,
 		to: string,
 		tokenId: number,
-		instructions: string = "verify payment proof",
-		rwaCurrentValue: bigint = BigInt(1000) // RWA current value for oracle verification
+		value: number
+		// quotedFee: MessagingFee // RWA current value for oracle verification
 	): Promise<TransferResult> => {
 		setLoading(true);
 		try {
-			// Call the smart contract to initiate cross-chain transfer
+			// Call the smart contract to initiate cross-chain transfer using the quoted fee
 			writeContract({
 				address: CONTRACT_ADDRESSES.RWAMINTER as `0x${string}`,
 				abi: RWAMINTER_ABI,
-				functionName: "hybridSendRWA",
+				functionName: "sendRWA",
 				args: [
 					destinationEid,
 					to as `0x${string}`,
 					BigInt(tokenId),
-					rwaCurrentValue, // Pass the RWA current value for oracle verification
-					"0x", // options - LayerZero options
+					BigInt(value),
+					"0x",
 				],
-				value: BigInt(0), // No ETH value needed for hybridSendRWA
 			});
 
 			return {
@@ -101,7 +101,7 @@ export const useRWA = () => {
 					destinationEid === CHAIN_IDS.SEPOLIA_EID
 						? "Sepolia"
 						: "Unknown chain"
-				} with RWA value ${rwaCurrentValue} for oracle verification`,
+				} with RWA value ${value} for oracle verification. Fee: `,
 			};
 		} catch (error) {
 			console.error("Cross-chain transfer error:", error);

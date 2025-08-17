@@ -25,3 +25,18 @@ export interface RWAStatus {
 	metadata?: string;
 	owner?: string;
 }
+
+// LayerZero types for cross-chain transfers
+export interface SendParam {
+	dstEid: number;
+	to: `0x${string}`;
+	tokenId: bigint;
+	extraOptions: `0x${string}`;
+	composeMsg: `0x${string}`;
+	onftCmd: `0x${string}`;
+}
+
+export interface MessagingFee {
+	nativeFee: bigint;
+	lzTokenFee: bigint;
+}

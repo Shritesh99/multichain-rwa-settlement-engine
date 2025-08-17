@@ -21,7 +21,7 @@ import type { OmniPointHardhat } from '@layerzerolabs/toolbox-hardhat'
 // }
 
 const hederatTestnetContract: OmniPointHardhat = {
-    eid: EndpointId.ARBSEP_V2_TESTNET,
+    eid: EndpointId.HEDERA_V2_TESTNET,
     contractName: 'RWAMinterONFT',
 }
 
